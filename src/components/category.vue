@@ -1,56 +1,48 @@
 <template>
   <div>
-    <h4>
-      <router-link :to="{ path: '/' }" class="h4">首页-></router-link>{{ name
-      }}<span v-if="sname">->{{ sname }}</span>
+    <h4 class="h4">
+      <router-link :to="{ path: '/' }" class="h4">首页 -> </router-link>{{ name
+      }}<span v-if="sname"> -> {{ sname }}</span>
     </h4>
-    <Row>
-      <div
-        class="ivu-col ivu-col-span-6"
-        v-for="(item, index) in List"
+    <Tabs :value="currentTabName" @on-click="changeTab">
+      <TabPane
+        :label="item.name"
+        :name="item.name"
+        v-for="(item, index) in subMenuList"
         :key="index"
       >
-        <Card>
-          <router-link
-            :to="{ path: '/ablumDetail', query: { aid: item.album.albumID } }"
+        <Row>
+          <div
+            class="ivu-col ivu-col-span-6"
+            v-for="(item, index2) in List"
+            :key="index2"
           >
-            <img :src="item.album.cover.urls[0].url" class="img" />
-          </router-link>
-          <h3>{{ item.album.name }}</h3>
-          <p>{{ item.album.desc }}</p>
-        </Card>
-      </div>
+            <Card>
+              <router-link
+                :to="{
+                  path: '/ablumDetail',
+                  query: { aid: item.album.albumID }
+                }"
+              >
+                <img :src="item.album.cover.urls[0].url" class="img" />
+              </router-link>
+              <h3>{{ item.album.name }}</h3>
+              <p>{{ item.album.desc }}</p>
+            </Card>
+          </div>
+        </Row>
+      </TabPane>
       <Spin size="large" fix v-if="spinShow"></Spin>
-    </Row>
-    <div class="row">
-      <div class="col-md-10 col-sm-10 col-xs-10 row">
-        <ol>
-          <button class="btn btn-info" @click="goto(prevIndex)">上一页</button>
-          <button class="btn btn-info" @click="goto(nextIndex)">下一页</button>
-        </ol>
-      </div>
-      <div class="col-md-2 col-sm-2 col-xs-2">
-        <ul class="list-group">
-          <li v-for="(item, index) in subMenuList" :key="index">
-            <router-link
-              :to="{
-                path: '/category',
-                query: { cid: item.id, cname: name, sname: item.name }
-              }"
-            >
-              <a>{{ item.name }}</a>
-            </router-link>
-          </li>
-        </ul>
-      </div>
-    </div>
+    </Tabs>
     <Page
       :current="current"
       :total="totalCount"
+      :page-size="20"
       show-sizer
       show-total
       @on-change="changePageList"
     />
+    <Spin size="large" fix v-if="spinShow"></Spin>
   </div>
 </template>
 
@@ -59,44 +51,30 @@ import { Card, Row } from "iview";
 export default {
   data() {
     return {
+      currentTabName: "",
       name: "",
       sname: "",
       List: [],
       subMenuList: [],
       current: 1,
-      spinShow: true
+      spinShow: true,
+      totalCount: 0
     };
   },
   components: {
     Card,
     Row
   },
-  computed: {
-    prevIndex() {
-      if (this.current == 0) return 0;
-      return this.current - 1;
-    },
-    nextIndex() {
-      return this.current + 1;
-    }
-  },
   created() {
     this.get();
   },
   methods: {
-    goto(index) {
-      this.current = index;
-      this.changeGet();
-    },
     get() {
       if (typeof this.$route.query.cid === "undefined") return;
+      this.currentTabName = this.$route.query.sname;
       this.$http
         .get(
-          "https://api.imjad.cn/qqfm/v1/?type=album&id=" +
-            this.$route.query.cid +
-            "&page=" +
-            this.current +
-            "&page_size=20"
+          `https://api.imjad.cn/qqfm/v1/?type=album&id=${this.$route.query.cid}&page=${this.current}&page_size=20`
         )
         .then(res => {
           this.name = this.$route.query.cname;
@@ -104,28 +82,28 @@ export default {
           this.List = res.data.data.albumInfoList;
           this.totalCount = res.data.data.total;
           this.spinShow = false;
-          //console.log(res.data.data)
           this.getSub();
         });
     },
     getSub() {
-      this.$http.get("/api/data").then(res => {
-        const tmp = res.data.data.catList;
+      this.$http.get("../../data.json").then(res => {
+        const tmp = res.data.catList;
         for (let i = 0; i < tmp.length; i++) {
-          if (this.$route.query.cid === tmp[i].id) {
+          // eslint-disable-next-line prettier/prettier
+          if ( tmp[i].subList.filter(item => item.id === this.$route.query.cid).length > 0) {
             this.subMenuList = tmp[i].subList;
             return;
           }
         }
       });
     },
-    changeGet() {
-      this.spinShow = true;
-      this.get();
-    },
     changePageList(page) {
       this.current = page;
       this.get();
+    },
+    changeTab(tab) {
+      const id = this.subMenuList.filter(item => item.name == tab)[0].id;
+      this.$router.push(`/category?cid=${id}&cname=${this.name}&sname=${tab}`);
     }
   },
   watch: {
@@ -147,13 +125,6 @@ h4,
   width: 100%;
   overflow: hidden;
 }
-ul,
-ol {
-  list-style-type: none;
-}
-ul {
-  background: red;
-}
 ul li {
   height: 50px;
   line-height: 50px;
@@ -163,7 +134,6 @@ ul li a {
   font-size: 14px;
   padding-left: 10px;
 }
-
 .img {
   width: 100%;
   height: 100%;
