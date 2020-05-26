@@ -31,12 +31,12 @@ npm run lint
 ```
 
 ### this project showCase
-![the indexPage](https://github.com/ljlhnick/vue-wangyiyun/blob/master/public/showCase/menuList.png)
-![List](https://github.com/ljlhnick/vue-wangyiyun/blob/master/public/showCase/List.png)
-![detail](https://github.com/ljlhnick/vue-wangyiyun/blob/master/public/showCase/detail.png)
-![page](https://github.com/ljlhnick/vue-wangyiyun/blob/master/public/showCase/page.png)
+![the indexPage](https://github.com/ljlhnick/vue-qqfm/blob/master/public/showCase/menuList.png)
+![List](https://github.com/ljlhnick/vue-qqfm/blob/master/public/showCase/List.png)
+![detail](https://github.com/ljlhnick/vue-qqfm/blob/master/public/showCase/detail.png)
+![page](https://github.com/ljlhnick/vue-qqfm/blob/master/public/showCase/page.png)
 fix bug
-![bug](https://github.com/ljlhnick/vue-wangyiyun/blob/master/public/showCase/bug.png)
+![bug](https://github.com/ljlhnick/vue-qqfm/blob/master/public/showCase/bug.png)
 ### API
 ```
 the document is here:  https://api.imjad.cn/qqfm.md
