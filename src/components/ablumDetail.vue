@@ -50,7 +50,7 @@ export default {
       List: ""
     };
   },
-  components:{
+  components: {
     BackTop
   },
   created() {
